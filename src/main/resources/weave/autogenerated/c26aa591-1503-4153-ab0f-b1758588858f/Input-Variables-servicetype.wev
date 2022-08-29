@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_c26aa591_1503_4153_ab0f_b1758588858f_Input_Variables_servicetype = String | Null
+

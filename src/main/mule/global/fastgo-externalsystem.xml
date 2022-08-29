@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="fastgo-externalsystemFlow" doc:id="8a336c76-0ee1-4793-bd1b-30f6dd7b5c57" >
+		<http:listener doc:name="Listener" doc:id="5887ee76-1dc1-461e-b769-25bd52208325" config-ref="HTTP_Listener_config" path="${http.listner.path}"/>
+		<logger level="INFO" doc:name="IN" doc:id="b7e306f5-f8c6-434c-b3e1-9f16c53e5248" message="started"/>
+		<ee:transform doc:name="Transform Message" doc:id="a3de10d3-8c57-4d57-9aac-a12252db819b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="servicetype" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.uriParams.servicetype]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="807f0392-cbcc-46ea-8429-855e4f7385fa" >
+			<when expression='#[vars.servicetype=="routes"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="f048d60c-a985-4133-90c4-5494d8c90613" message="route started"/>
+				<flow-ref doc:name="Flow Reference" doc:id="a7681b03-98ec-411c-8b65-63a19bd2c761" name="getroutes-implementationSub_Flow"/>
+			</when>
+			<when expression='#[vars.servicetype=="schedules"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="19b40a28-796d-4f38-9e2f-c60f9eacdbab" message="schedule started"/>
+				<flow-ref doc:name="Flow Reference" doc:id="4089a947-b5ab-4774-9ca4-d596f1a15045" name="getschedules-implementationSub_Flow"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="7f5a7091-3acd-45db-b7d9-a60c33075c03" message="check the service type"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="OUT" doc:id="28a33b54-9364-47f4-a589-32f493eb9396" message="completed"/>
+	</flow>
+</mule>
